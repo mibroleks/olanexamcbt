@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Dashboard | OLAN ACADEMY</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* ---------- Global Styles ---------- */
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            background: #f0f2f5; 
+            color: #333;
+        }
+
+        ul { 
+            list-style: none; 
+            padding: 0; 
+            margin-top: 1rem;
+        }
+
+        li { 
+            background: white; 
+            margin-bottom: 0.5rem; 
+            padding: 0.75rem; 
+            border-radius: 6px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+            transition: transform 0.2s;
+            text-align: center;
+            font-weight: bold;
+            color: #8B1C2E;
+        }
+        li:hover { transform: scale(1.02); }
+
+        .header { 
+            background: #8B1C2E; 
+            color: white; 
+            text-align: center; 
+            padding: 1rem; 
+            position: relative;
+        }
+
+        .container { 
+            max-width: 700px; 
+            margin: auto; 
+            padding: 1rem; 
+        }
+
+        .msg { 
+            padding: 1rem; 
+            background: #fffbcc; 
+            border: 1px solid #ffe58f; 
+            border-radius: 6px; 
+            margin-top: 1rem; 
+            text-align: center;
+        }
+
+        /* ---------- Active Link Button ---------- */
+        .active-link-btn { 
+            display: inline-block; 
+            background-color: #8B1C2E; 
+            color: white; 
+            padding: 0.75rem 1.5rem; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 1rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-align: center;
+            text-decoration: none;
+            margin-bottom: 1rem;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .active-link-btn:hover {
+            background-color: #a22b3a;
+            transform: scale(1.05);
+        }
+
+        /* ---------- Logout Button ---------- */
+        .logout-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: #f5b041;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .logout-btn:hover {
+            background: #e67e22;
+            transform: scale(1.05);
+        }
+
+        /* ---------- Pagination ---------- */
+        .pagination {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .pagination a, .pagination span {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            margin: 0 3px;
+            border: 1px solid #8B1C2E;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #8B1C2E;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .pagination a:hover {
+            background: #8B1C2E;
+            color: white;
+        }
+        .pagination .active-page {
+            background: #8B1C2E;
+            color: white;
+        }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 480px) {
+            .active-link-btn {
+                width: 100%;
+                padding: 0.75rem 0;
+            }
+            .container {
+                padding: 0.5rem;
+            }
+            .logout-btn {
+                position: static;
+                display: block;
+                margin: 0.5rem auto;
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <!-- ✅ Display student info dynamically -->
+    <h1>Welcome, {{ student['name'] }}</h1>
+    <p>Class: {{ student['class_name'] }}</p>
+
+    <!-- ✅ Added visible Logout button -->
+    <form method="get" action="/logout">
+        <button type="submit" class="logout-btn">Logout</button>
+    </form>
+</div>
+
+<div class="container">
+
+    <!-- ✅ Prevent Undefined Errors -->
+    {% set active_links = active_links or [] %}
+    {% set links = links or [] %}
+    {% set link_page = link_page or 1 %}
+    {% set total_pages = total_pages or 1 %}
+
+    <!-- ---------- Active Form Links (Support Multiple) ---------- -->
+    {% if active_links|length > 0 %}
+        <div style="text-align:center;">
+            {% for link in active_links %}
+                <a href="{{ link['url'] }}" target="_blank" class="active-link-btn">
+                    📌 {{ link['name'] }}
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="msg">No active form links currently assigned by your admin.</div>
+    {% endif %}
+
+    <!-- ---------- List of Other Links ---------- -->
+    {% if links|length > 0 %}
+        <ul>
+            {% for link in links %}
+                {% if active_links is not defined or link['id'] not in active_links|map(attribute='id') %}
+                    <li>{{ link['name'] }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="msg">No subjects available at the moment. Please check back later.</div>
+    {% endif %}
+
+    <!-- ✅ Pagination (Fixed visibility and styling) -->
+    {% if total_pages > 1 %}
+        <div class="pagination">
+            {% if link_page > 1 %}
+                <a href="?page={{ link_page - 1 }}">⬅ Prev</a>
+            {% endif %}
+
+            {% for i in range(1, total_pages + 1) %}
+                {% if i == link_page %}
+                    <span class="active-page">{{ i }}</span>
+                {% else %}
+                    <a href="?page={{ i }}">{{ i }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if link_page < total_pages %}
+                <a href="?page={{ link_page + 1 }}">Next ➡</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+<!-- ---------- Optional SPA / Mobile Enhancement ---------- -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".active-link-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                console.log("Active form link clicked:", btn.href);
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
