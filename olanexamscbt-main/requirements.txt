@@ -1,17 +1,21 @@
+# === Core Framework ===
 fastapi
 uvicorn[standard]
 jinja2
 python-multipart
 pydantic
+
+# === Security & Auth ===
 itsdangerous
-fastapi
-uvicorn
-jinja2
-itsdangerous
-python-multipart
+passlib[bcrypt]
+bcrypt
+python-dotenv
+
+# === Database & Files ===
 sqlalchemy
 sqlite-utils
 aiofiles
-python-dotenv
-passlib
-bcrypt
+
+# === Optional (if you use CSV/Excel import/export) ===
+pandas
+openpyxl
