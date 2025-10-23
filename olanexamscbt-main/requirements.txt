@@ -4,3 +4,14 @@ jinja2
 python-multipart
 pydantic
 itsdangerous
+fastapi
+uvicorn
+jinja2
+itsdangerous
+python-multipart
+sqlalchemy
+sqlite-utils
+aiofiles
+python-dotenv
+passlib
+bcrypt
